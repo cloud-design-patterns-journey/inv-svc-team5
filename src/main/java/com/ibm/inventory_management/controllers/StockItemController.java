@@ -2,39 +2,32 @@ package com.ibm.inventory_management.controllers;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.ibm.inventory_management.models.StockItem;
-import com.ibm.inventory_management.services.StockItemApi;
+import com.ibm.inventory_management.services.query.StockQueryService;
 
+/**
+ * Query side: read-only, cached endpoints
+ */
 @RestController
 public class StockItemController {
 
-    private final StockItemApi service;
+    private final StockQueryService queryService;
 
-    public StockItemController(StockItemApi service) {
-        this.service = service;
+    public StockItemController(StockQueryService queryService) {
+        this.queryService = queryService;
     }
 
     @GetMapping(path = "/stock-items", produces = "application/json")
     public List<StockItem> listStockItems() {
-        return this.service.listStockItems();
+        return this.queryService.listStockItems();
     }
 
-    @PostMapping(path = "/stock-item")
-    public void addStockItem(@RequestParam String name, @RequestParam String manufacturer, @RequestParam float price,
-            @RequestParam int stock) {
-        this.service.addStockItem(name, manufacturer, price, stock);
-    }
-
-    @PutMapping(path = "/stock-item/{id}")
-    public void updateStockItem(@PathVariable("id") String id, @RequestParam String name,
-            @RequestParam String manufacturer, @RequestParam float price, @RequestParam int stock) {
-        this.service.updateStockItem(id, name, manufacturer, price, stock);
-    }
-
-    @DeleteMapping(path = "/stock-item/{id}")
-    public void deleteStockItem(@PathVariable("id") String id) {
-        this.service.deleteStockItem(id);
+    @GetMapping(path = "/stock-item/{id}", produces = "application/json")
+    public StockItem getStockItem(@PathVariable("id") String id) {
+        return this.queryService.getStockItem(id);
     }
 }
